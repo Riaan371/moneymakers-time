@@ -40,6 +40,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 const navItems = [
   { to: '/', label: 'Dashboard' },
   { to: '/track', label: 'Track' },
+  { to: '/review', label: 'Review' },
   { to: '/clients', label: 'Clients' },
   { to: '/invoices', label: 'Invoices' },
   { to: '/settings', label: 'Settings' },

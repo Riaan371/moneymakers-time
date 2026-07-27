@@ -68,3 +68,26 @@ export type PracticeSettings = {
   currency: string
   default_hourly_rate: number
 }
+
+export type TrackingRule = {
+  id: string
+  pattern: string
+  client_id: string
+  category_id: string | null
+  priority: number
+  active: boolean
+}
+
+export type CapturedSegment = {
+  id: string
+  user_id: string
+  window_title: string
+  app_name: string | null
+  started_at: string
+  ended_at: string
+  matched_rule_id: string | null
+  client_id: string | null
+  category_id: string | null
+  status: 'pending' | 'approved' | 'ignored'
+  resulting_entry_id: string | null
+}

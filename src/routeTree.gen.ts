@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as InvoicesRouteImport } from './routes/invoices'
+import { Route as ReviewRouteImport } from './routes/review'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TrackRouteImport } from './routes/track'
 
@@ -30,6 +31,11 @@ const InvoicesRoute = InvoicesRouteImport.update({
   path: '/invoices',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReviewRoute = ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/invoices': typeof InvoicesRoute
+  '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/track': typeof TrackRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/invoices': typeof InvoicesRoute
+  '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/track': typeof TrackRoute
 }
@@ -60,21 +68,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/invoices': typeof InvoicesRoute
+  '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/track': typeof TrackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/clients' | '/invoices' | '/settings' | '/track'
+  fullPaths: '/' | '/clients' | '/invoices' | '/review' | '/settings' | '/track'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/clients' | '/invoices' | '/settings' | '/track'
-  id: '__root__' | '/' | '/clients' | '/invoices' | '/settings' | '/track'
+  to: '/' | '/clients' | '/invoices' | '/review' | '/settings' | '/track'
+  id:
+    | '__root__'
+    | '/'
+    | '/clients'
+    | '/invoices'
+    | '/review'
+    | '/settings'
+    | '/track'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClientsRoute: typeof ClientsRoute
   InvoicesRoute: typeof InvoicesRoute
+  ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   TrackRoute: typeof TrackRoute
 }
@@ -102,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvoicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/review': {
+      id: '/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -123,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClientsRoute: ClientsRoute,
   InvoicesRoute: InvoicesRoute,
+  ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   TrackRoute: TrackRoute,
 }
