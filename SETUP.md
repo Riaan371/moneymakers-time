@@ -79,6 +79,14 @@ VITE_SUPABASE_ANON_KEY=sb_publishable_...
 
 From then on it's just: start the timer, pick client + category (Payroll processing / Xero / Documents / …), stop, done. The dashboard shows, per client per month, hours tracked vs retainer fee vs what was invoiced.
 
+## 8. Run migration 0002 (automatic tracking)
+
+Same as step 2 — paste `supabase/migrations/0002_auto_tracking.sql` into the SQL Editor and run it. Adds the tables the desktop agent and the **Review** screen use: `tracking_rules` (window-title → client/category mapping) and `captured_segments` (raw activity awaiting approval).
+
+## 9. Desktop agent (automatic time capture)
+
+Optional, built but not yet compiled — see [`desktop-agent/README.md`](./desktop-agent/README.md) for the full setup (installing Rust/Tauri, building, first run). Short version: it's a tray app that watches the foreground window title (e.g. picks up a client's Xero org name or a payroll filename automatically) and syncs candidate time segments to the **Review** screen — nothing gets billed until approved there.
+
 ---
 
 ## Phase 2 (not set up yet — planned)
