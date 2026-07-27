@@ -4,7 +4,6 @@
 mod sync;
 mod tracker;
 
-use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use tauri::{
     menu::{Menu, MenuItem},
@@ -12,6 +11,7 @@ use tauri::{
     Manager,
 };
 use tauri_plugin_autostart::MacosLauncher;
+use tokio::sync::Mutex;
 
 const POLL_INTERVAL_SECS: u64 = 5;
 const IDLE_THRESHOLD_SECS: u32 = 240; // 4 minutes away -> stop counting
@@ -29,7 +29,7 @@ type SharedSession = Mutex<Option<sync::Session>>;
 #[tauri::command]
 async fn sign_in(app: tauri::AppHandle, email: String, password: String) -> Result<(), String> {
     let session = sync::Session::sign_in(&email, &password).await?;
-    *app.state::<SharedSession>().lock().unwrap() = Some(session);
+    *app.state::<SharedSession>().lock().await = Some(session);
     if let Some(win) = app.get_webview_window("login") {
         let _ = win.hide();
     }
@@ -83,7 +83,7 @@ fn spawn_tracking_loop(app: tauri::AppHandle) {
 
             if last_flush.elapsed().as_secs() >= FLUSH_INTERVAL_SECS && !pending.is_empty() {
                 let state = app.state::<SharedSession>();
-                let mut guard = state.lock().unwrap();
+                let mut guard = state.lock().await;
                 if let Some(session) = guard.as_mut() {
                     if session.refresh().await.is_ok() && session.push_segments(&pending).await.is_ok() {
                         pending.clear();
@@ -143,7 +143,7 @@ fn main() {
             let handle2 = handle.clone();
             tauri::async_runtime::spawn(async move {
                 if let Some(session) = sync::Session::from_stored().await {
-                    *handle2.state::<SharedSession>().lock().unwrap() = Some(session);
+                    *handle2.state::<SharedSession>().lock().await = Some(session);
                     spawn_tracking_loop(handle2.clone());
                 } else if let Some(win) = handle2.get_webview_window("login") {
                     let _ = win.show();
