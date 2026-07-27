@@ -1,0 +1,6 @@
+{
+  "identifier": "default",
+  "description": "Default capability for the MoneyMakers Tracker agent",
+  "windows": ["login"],
+  "permissions": ["core:default", "autostart:default"]
+}

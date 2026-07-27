@@ -11,6 +11,7 @@ use tauri::{
     tray::TrayIconBuilder,
     Manager,
 };
+use tauri_plugin_autostart::MacosLauncher;
 
 const POLL_INTERVAL_SECS: u64 = 5;
 const IDLE_THRESHOLD_SECS: u32 = 240; // 4 minutes away -> stop counting
@@ -97,9 +98,17 @@ fn spawn_tracking_loop(app: tauri::AppHandle) {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            None,
+        ))
         .manage(Mutex::new(None::<sync::Session>))
         .invoke_handler(tauri::generate_handler![sign_in])
         .setup(|app| {
+            use tauri_plugin_autostart::ManagerExt;
+            // Runs once per install; harmless (and cheap) to call again on every launch.
+            let _ = app.autolaunch().enable();
+
             let handle = app.handle().clone();
 
             let show_i = MenuItem::with_id(
