@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'desktop-agent/**'
+      - '.github/workflows/build-desktop-agent.yml'
   workflow_dispatch:
 
 jobs:
@@ -26,7 +27,7 @@ jobs:
       - name: Install Tauri CLI (cached)
         uses: taiki-e/cache-cargo-install-action@v2
         with:
-          tool: tauri-cli@^2.0
+          tool: tauri-cli@2
 
       - name: Generate app icons
         run: cargo tauri icon icons/source-icon.png
