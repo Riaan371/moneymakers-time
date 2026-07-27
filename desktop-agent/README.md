@@ -17,53 +17,51 @@ app uses. Nothing is billed automatically — captured segments land in the
 - Every 2 minutes it pushes queued segments to Supabase, where a database
   trigger tries to match them against admin-defined **tracking rules**
   (Review screen → Manage rules) to pre-fill a client/category.
+- Starts automatically on login (no staff member has to remember to launch it).
 
-## One-time setup on this machine (not done yet)
+## Getting the installer (recommended: CI build, no local setup)
 
-This machine doesn't have the Rust toolchain installed, which Tauri (the
-framework this agent is built with) needs to compile. Run these yourself in
-your own terminal — they need a GUI installer step Claude can't safely
-automate:
+Every push that touches `desktop-agent/` builds a fresh installer on GitHub's
+servers — nothing needs installing on your own machine for this.
 
-1. **Install Rust**: https://rustup.rs → download `rustup-init.exe` → run it,
-   accept the defaults.
-2. **Install the Tauri CLI**:
-   ```
-   cargo install tauri-cli --version "^2.0"
-   ```
-3. **Install Windows build prerequisites** (needed to compile any Rust GUI
-   app on Windows) — follow the "Windows" section here:
-   https://v2.tauri.app/start/prerequisites/ — it walks you through the
-   Microsoft C++ Build Tools installer (a few GB, one-time).
+1. Go to the repo's **Actions** tab → **Build Desktop Agent** → the latest
+   green run.
+2. Scroll to **Artifacts** → download **`moneymakers-tracker-staff-rollout`**.
+3. Unzip it. Inside: the installer `.exe` (and `.msi`) plus
+   `install-on-staff-pc.bat`.
+4. Copy that whole unzipped folder to a USB stick or shared drive, take it to
+   any staff PC, double-click `install-on-staff-pc.bat`. It installs silently
+   and starts the tracker (approve the "Allow this app to make changes?"
+   Windows prompt if it appears — normal for any installer).
+5. First launch shows a small sign-in window — staff enter their own Money
+   Makers Time email/password. After that it's silent in the tray.
 
-## Building
+## Building locally instead (optional)
 
-From inside this `desktop-agent` folder:
+Only worth doing if you want faster iteration while making changes. Needs:
+
+1. **Rust**: https://rustup.rs
+2. **Tauri CLI**: `cargo install tauri-cli --version "^2.0"`
+3. **Windows C++ Build Tools** (Tauri prerequisite) — see
+   https://v2.tauri.app/start/prerequisites/. Note: if this machine has
+   Windows 11 **Smart App Control** enabled, it will block cargo's build
+   scripts from running (a "one-way" security setting — Microsoft only lets
+   you turn it back on via a full OS reinstall). If you hit
+   `os error 4551` during any cargo build, that's it — the CI path above
+   sidesteps this entirely, which is why it's the default recommendation.
+
+Then, from inside `desktop-agent/`:
 
 ```
-cd desktop-agent
-cargo tauri icon icons/source-icon.png
+cargo tauri icon icons/source-icon.png   # once, or after swapping the logo
 cargo tauri build
 ```
 
-The `icon` command only needs to run once — it generates the full icon set
-Windows needs from the placeholder logo already in `icons/source-icon.png`
-(swap that file for Money Makers' real logo first if you have one).
+Output lands in `desktop-agent/target/release/bundle/nsis/` (and `msi/`).
 
-`cargo tauri build` produces an installer in
-`desktop-agent/target/release/bundle/nsis/` (or `msi/`) that you run once on
-the machine that'll track time. It installs to the tray and starts on login.
+## Updating the app later
 
-## First run
-
-A small sign-in window appears — enter the same email/password used to log
-into the web app. After that it runs silently in the tray; right-click the
-icon for "Sign in / switch account" or "Quit".
-
-## Note on this first version
-
-This was written without a local Rust toolchain to compile against (none
-was installed on the dev machine at the time), so treat the first
-`cargo build` as a first pass — Tauri's exact API shifts slightly between
-versions and something may need a small fix. Paste any compiler errors back
-and they're usually quick to resolve.
+Change the code under `desktop-agent/src/`, commit, push to `main`. CI builds
+a new installer automatically — grab it from Actions the same way as above
+and roll it out again. (Existing installs aren't auto-updated; re-running the
+installer replaces the old version.)

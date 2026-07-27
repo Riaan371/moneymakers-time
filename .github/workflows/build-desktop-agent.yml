@@ -34,10 +34,16 @@ jobs:
       - name: Build installer
         run: cargo tauri build
 
-      - name: Upload installer
+      - name: Assemble staff rollout package
+        shell: bash
+        run: |
+          mkdir -p ../rollout-package
+          cp target/release/bundle/nsis/*.exe ../rollout-package/ || true
+          cp target/release/bundle/msi/*.msi ../rollout-package/ || true
+          cp install-on-staff-pc.bat ../rollout-package/
+
+      - name: Upload staff rollout package
         uses: actions/upload-artifact@v4
         with:
-          name: moneymakers-tracker-windows-installer
-          path: |
-            desktop-agent/target/release/bundle/nsis/*.exe
-            desktop-agent/target/release/bundle/msi/*.msi
+          name: moneymakers-tracker-staff-rollout
+          path: rollout-package/
